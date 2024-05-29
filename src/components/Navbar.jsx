@@ -12,7 +12,7 @@ const Navbar = () => {
       <nav className="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
           <a className="navbar-brand" href="#">
-            Ghaley <span className="text-danger">Movies</span>
+            Legion <span className="text-danger">Movies</span>
           </a>
           <button
             className="navbar-toggler"

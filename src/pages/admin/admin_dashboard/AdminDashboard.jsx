@@ -1,54 +1,89 @@
 
-import React, { useState } from "react";
-import { createProductApi } from "../../../apis/Api";
+import React, { useState, useEffect } from "react";
+import { createProductApi, getAllProductsApi } from "../../../apis/Api";
 import { toast } from "react-toastify";
- 
+
 const AdminDashboard = () => {
+
+  // 1. State for all fetched products
+  const [products, setProducts] = useState([]) //array
+
+  // 2. Call API initially (page load) - set all fetch products to state(1)
+  useEffect(() => {
+    getAllProductsApi().then((res) => {
+      // response : res.data.products (all products)
+      setProducts(res.data.products)
+
+
+    }).catch((error) => {
+      console.log(error)
+    })
+  }, [])
+  console.log(products)
+
+
   // State for  input fields
   const [productName, setProductName] = useState("");
   const [productPrice, setProductPrice] = useState("");
   const [productCategory, setProductCategory] = useState("");
   const [productDescription, setProductDescription] = useState("");
- 
+
   // State for image file
   const [productImage, setProductImage] = useState("");
   const [previewImage, setPreviewImage] = useState("");
- 
+
   // Image Upload Handler
   const handleImage = (event) => {
     const file = event.target.files[0];
     setProductImage(file); // For storing the file in Backend
     setPreviewImage(URL.createObjectURL(file)); // For previewing the image
   };
- 
+
+
   // Handle Submit
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     // make a form data (text, files)
     const formData = new FormData()
-    formData.append('productName', productName) 
-    formData.append('productPrice', productPrice) 
-    formData.append('productCategory', productCategory) 
-    formData.append('productDescription', productDescription) 
-    formData.append('productImage', productImage) 
+    formData.append('productName', productName)
+    formData.append('productPrice', productPrice)
+    formData.append('productCategory', productCategory)
+    formData.append('productDescription', productDescription)
+    formData.append('productImage', productImage)
 
     // Make a api call
     createProductApi(formData).then((res) => {
-      if(res.data.success === false) {
-        toast.error(res.data.message)
-      } else {
+      // FOR successfull api
+      if (res.status === 201) {
         toast.success(res.data.message)
+      }
+
+    }).catch((error) => {
+      //for error status code
+
+      if (error.response) {
+
+        if (error.response.status === 400) {
+          toast.warning(error.response.data.message)
+        } else if (error.response.status === 500) {
+          toast.error(error.response.data.message)
+        } else {
+          toast.error("Something went wrong!!")
+        }
+
+      } else {
+        toast.error("Something went wrong!")
       }
     })
 
   };
- 
+
   return (
     <div className="container mt-3">
       <div className="d-flex justify-content-between">
         <h3>Admin Dashboard</h3>
- 
+
         <button
           type="button"
           class="btn btn-danger"
@@ -57,7 +92,7 @@ const AdminDashboard = () => {
         >
           Add Product
         </button>
- 
+
         <div
           class="modal fade"
           id="exampleModal"
@@ -87,7 +122,7 @@ const AdminDashboard = () => {
                     className="form-control"
                     placeholder="Enter Product Name"
                   />
- 
+
                   <label className="mt-2">Product Price </label>
                   <input
                     onChange={(e) => setProductPrice(e.target.value)}
@@ -95,7 +130,7 @@ const AdminDashboard = () => {
                     className="form-control"
                     placeholder="Enter Product Price"
                   />
- 
+
                   <label className="mt-2">Choose Product Category</label>
                   <select
                     onChange={(e) => setProductCategory(e.target.value)}
@@ -106,20 +141,20 @@ const AdminDashboard = () => {
                     <option value="gadgets">Gadgets</option>
                     <option value="furniture">Furniture</option>
                   </select>
- 
+
                   <label className="mt-2">Enter Description</label>
                   <textarea
                     onChange={(e) => setProductDescription(e.target.value)}
                     className="form-control"
                   ></textarea>
- 
+
                   <label className="mt-2">Upload Product Image</label>
                   <input
                     onChange={handleImage}
                     type="file"
                     className="form-control"
                   />
- 
+
                   {/** Image Preview */}
                   {previewImage && (
                     <img
@@ -150,7 +185,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       </div>
- 
+
       <table className="table mt-2">
         <thead className="table-dark">
           <tr>
@@ -163,29 +198,39 @@ const AdminDashboard = () => {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>
-              <img
-                width={"40px"}
-                height={"40px"}
-                src="https://i.pinimg.com/originals/b4/02/6a/b4026a9fed083cc40ea891c21f1bdd09.jpg"
-                alt=" "
-              />
-            </td>
-            <td>Flower</td>
-            <td>200</td>
-            <td>Indoor</td>
-            <td>Beautiful Flower</td>
-            <td>
-              <button className="btn btn-primary"> Edit</button>
-              <button className="btn btn-danger ms-2"> Delete</button>
-            </td>
-          </tr>
+
+          {
+            products.map((singleProduct) => (
+
+              <tr>
+                <td>
+                  <img
+                    width={"40px"}
+                    height={"40px"}
+                    src={`http://localhost:500/products/${singleProduct.productImage}`}
+                    alt=" "
+                  />
+                </td>
+                <td>{singleProduct.productName}</td>
+                <td>{singleProduct.productPrice}</td>
+                <td>{singleProduct.productCategory}</td>
+                <td>{singleProduct.productDescription}</td>
+                <td>
+                  <button className="btn btn-primary"> Edit</button>
+                  <button className="btn btn-danger ms-2"> Delete</button>
+                </td>
+              </tr>
+
+
+
+
+            ))
+          }
+
         </tbody>
       </table>
-    </div>
+    </div >
   );
 };
- 
+
 export default AdminDashboard;
- 
