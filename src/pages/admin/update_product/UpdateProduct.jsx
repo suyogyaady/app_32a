@@ -1,8 +1,33 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { getSingleProductApi, updateProduct } from '../../../apis/Api'
+import { toast } from 'react-toastify'
 
 const UpdateProduct = () => {
     // get id from url
+    const { id } = useParams()
+
     // get product information (Backend)
+    useEffect(() => {
+
+        getSingleProductApi(id).then((res) => {
+            console.log(res.data)
+
+            //res -> data(message, success, product(pn,pp,pc) )
+            //res.data.product.productName
+            setProductName(res.data.product.productName)
+            setProductPrice(res.data.product.productPrice)
+            setProductCategory(res.data.product.productCategory)
+            setProductDescription(res.data.product.productDescription)
+            setOldImage(res.data.product.productImage)
+
+
+        }).catch((error) => {
+            console.log(error)
+        })
+
+    }, {})
+
     // fill all the info in each fields
 
     // make a use state
@@ -23,6 +48,33 @@ const UpdateProduct = () => {
         setPreviewNewImage(URL.createObjectURL(file))
     }
 
+    // update product
+    const handleUpdate = (e) => {
+        e.preventDefault()
+
+        // make a form data (text, files)
+        const formData = new FormData()
+        formData.append('productName', productName)
+        formData.append('productPrice', productPrice)
+        formData.append('productCategory', productCategory)
+        formData.append('productDescription', productDescription)
+
+        if(productNewImage){
+            formData.append('productImage', productNewImage)
+        }
+
+        // call update product API
+        updateProduct(id, formData).then((res) => {
+            if (res.status === 201) {
+                toast.success(res.data.message)
+            }
+        }).catch((error) => {
+            if (error.response.status === 500) {
+                toast.error(error.response.data.message)
+            }
+        })
+    }
+
 
 
 
@@ -35,18 +87,18 @@ const UpdateProduct = () => {
         <>
             <div className='container mt-3'>
 
-                <h2>Update product for <span className='text-danger'>'Flower'</span></h2>
+                <h2>Update product for <span className='text-danger'>{productName}</span></h2>
 
                 <div className='d-flex gap-3'>
                     <form action="">
                         <label htmlFor="">Product Name</label>
-                        <input onChange={(e) => setProductName(e.target.value)} className='form-control' type="text" placeholder='Enter your product name' />
+                        <input value={productName} onChange={(e) => setProductName(e.target.value)} className='form-control' type="text" placeholder='Enter your product name' />
 
                         <label className='mt-2' htmlFor="">Product Price</label>
-                        <input onChange={(e) => setProductPrice(e.target.value)} className='form-control' type="number" placeholder='Enter your product name' />
+                        <input value={productPrice} onChange={(e) => setProductPrice(e.target.value)} className='form-control' type="number" placeholder='Enter your product name' />
 
                         <label className='mt-2'>Choose category</label>
-                        <select onChange={(e) => setProductCategory(e.target.value)} className='form-control'>
+                        <select value={productCategory} onChange={(e) => setProductCategory(e.target.value)} className='form-control'>
                             <option value="plants">Plants</option>
                             <option value="electronics">Electronics</option>
                             <option value="gadgets">Gadgets</option>
@@ -54,23 +106,23 @@ const UpdateProduct = () => {
                         </select>
 
                         <label className='mt-2'>Enter description</label>
-                        <textarea onChange={(e) => setProductDescription(e.target.value)} className='form-control'></textarea>
+                        <textarea value={productDescription} onChange={(e) => setProductDescription(e.target.value)} className='form-control'></textarea>
 
                         <label className='mt-2'>Choose product Image</label>
                         <input onChange={handleImage} type="file" className='form-control' />
 
-                        <button className='btn btn-danger w-100 mt-2'>Update Product</button>
+                        <button onClick={handleUpdate} className='btn btn-danger w-100 mt-2'>Update Product</button>
 
 
                     </form>
                     <div className='image section'>
                         <h6>Previewing old image</h6>
-                        <img height={'200px'} width={'300px'} className='image-fluid rounded-4 object-fit-cover' src="https://www.southernliving.com/thmb/xFlQn020pc1NJAl4ksr7_o_B5u4=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/GettyImages-598083938-1-22dab883ff2a43d8b2751d9f363f2d5d.jpg"/>
+                        <img height={'200px'} width={'300px'} className='image-fluid rounded-4 object-fit-cover' src={`http://localhost:5000/products/${oldImage}`} />
 
                         {
                             previewNewImage && <>
-                            <h6>New Image</h6>
-                            <img height={'200px'} width={'200px'} className='image-fluid rounded-4 object-fit-cover' src={previewNewImage}/>
+                                <h6>New Image</h6>
+                                <img height={'200px'} width={'200px'} className='image-fluid rounded-4 object-fit-cover' src={previewNewImage} />
                             </>
                         }
 
