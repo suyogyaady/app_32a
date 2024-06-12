@@ -35,10 +35,10 @@ export const getAllProductsApi = () => Api.get('/api/product/get_all_products', 
 export const getSingleProductApi = (id) => Api.get(`/api/product/get_single_products/${id}`, config)
 
 // delete product API
-export const deleteProduct = (id) => Api.delete(`/api/product/delete_product/${id}`)
+export const deleteProduct = (id) => Api.delete(`/api/product/delete_product/${id}`,config)
 
 // update product API
-export const updateProduct = (id, data) => Api.put(`/api/product/update_product/${id}`, data)
+export const updateProduct = (id, data) => Api.put(`/api/product/update_product/${id}`, data, config)
 
 
 // http://localhost:5000/test
