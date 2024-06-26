@@ -14,6 +14,7 @@ import AdminRoutes from "./protected_routes/AdminRoutes";
 import UserRoutes from "./protected_routes/UserRoutes";
 import Profile from "./pages/profile/Profile";
 import StopWatch from "./pages/test/StopWatch";
+import ForgotPassword from "./pages/forgot_password/ForgotPassword";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
         <Route element={UserRoutes}>
           <Route path="/profile" element={<Profile />} />
         </Route>
+        <Route path="/forgot_password" element={<ForgotPassword/>}></Route>
       </Routes>
     </Router>
   );
