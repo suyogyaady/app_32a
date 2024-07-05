@@ -162,7 +162,6 @@ const Register = () => {
             placeholder="Enter your Phone Number"
           />
           {phoneError && <p className="text-danger">{phoneError}</p>}
-          
 
           <label className="mt-2">Password</label>
           <input
@@ -186,9 +185,7 @@ const Register = () => {
             <p className="text-danger">{confirmPasswordError}</p>
           )}
 
-          <button onClick={handleSubmit} className="btn btn-dark mt-2 w-100">
-            Create an Account!
-          </button>
+          <button onClick={handleSubmit} className="btn btn-dark mt-2 w-100">Submit</button>
         </form>
       </div>
     </>
